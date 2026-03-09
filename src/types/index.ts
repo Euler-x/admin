@@ -52,7 +52,7 @@ export interface Strategy {
   risk_profile: RiskProfile;
   leverage_limit: number;
   max_positions: number;
-  capital_allocation: number;
+  allocation_pct: number;
   max_drawdown_percent: number;
   is_active: boolean;
   created_at: string;
@@ -64,7 +64,7 @@ export interface AdminStrategyUpdate {
   risk_profile?: RiskProfile;
   leverage_limit?: number;
   max_positions?: number;
-  capital_allocation?: number;
+  allocation_pct?: number;
   max_drawdown_percent?: number;
   is_active?: boolean;
 }

@@ -12,7 +12,6 @@ import Pagination from "@/components/ui/Pagination";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import useAdminStrategies from "@/hooks/useAdminStrategies";
 import usePagination from "@/hooks/usePagination";
-import { formatCurrency } from "@/lib/utils";
 import type { Strategy, StrategyType, RiskProfile } from "@/types";
 
 const riskVariant: Record<RiskProfile, "success" | "warning" | "danger"> = {
@@ -128,10 +127,10 @@ export default function StrategiesPage() {
       ),
     },
     {
-      key: "capital_allocation",
-      header: "Allocation",
+      key: "allocation_pct",
+      header: "Allocation %",
       render: (strategy: Strategy) => (
-        <span className="text-gray-300">{formatCurrency(strategy.capital_allocation)}</span>
+        <span className="text-gray-300">{strategy.allocation_pct}%</span>
       ),
     },
     {
