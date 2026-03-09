@@ -105,6 +105,7 @@ export interface Execution {
   leverage: number;
   pnl: number | null;
   tx_hash: string | null;
+  error_message: string | null;
   status: ExecutionStatus;
   executed_at: string | null;
   created_at: string;
