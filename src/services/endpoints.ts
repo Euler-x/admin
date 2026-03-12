@@ -98,11 +98,28 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `${API}/admin/ambassadors/${id}`,
   },
 
-  // Admin Analytics
+  // Admin Analytics (extended)
   ANALYTICS: {
     REVENUE: `${API}/admin/analytics/revenue`,
     USERS: `${API}/admin/analytics/users`,
     EXECUTIONS: `${API}/admin/analytics/executions`,
+    DASHBOARD: `${API}/admin/analytics/dashboard`,
+    TRADING: `${API}/admin/analytics/trading`,
+    SIGNALS: `${API}/admin/analytics/signals`,
+    USERS_CHART: `${API}/admin/analytics/users-chart`,
+    REVENUE_CHART: `${API}/admin/analytics/revenue-chart`,
+  },
+
+  // Admin System
+  SYSTEM: {
+    HEALTH: `${API}/admin/system/health`,
+    PIPELINE: `${API}/admin/system/pipeline`,
+  },
+
+  // Admin Payments
+  PAYMENTS: {
+    LIST: `${API}/admin/payments`,
+    GET: (id: string) => `${API}/admin/payments/${id}`,
   },
 
   // Admin Config

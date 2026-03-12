@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard, Users, CreditCard, FileText, MessageSquare,
-  Brain, Zap, Activity, ArrowLeftRight, Crown, Star,
-  ScrollText, Settings, LogOut, ShieldAlert,
+  LayoutDashboard, BarChart3, Users, CreditCard, FileText, MessageSquare,
+  Brain, Zap, Activity, ArrowLeftRight, Crown, Star, Wallet,
+  ScrollText, Settings, Server, LogOut, ShieldAlert,
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -15,6 +15,7 @@ const navGroups = [
     label: "Overview",
     items: [
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { label: "Analytics", href: "/analytics", icon: BarChart3 },
     ],
   },
   {
@@ -22,6 +23,8 @@ const navGroups = [
     items: [
       { label: "Users", href: "/users", icon: Users },
       { label: "Plans", href: "/plans", icon: CreditCard },
+      { label: "Subscriptions", href: "/subscriptions", icon: Crown },
+      { label: "Payments", href: "/payments", icon: Wallet },
       { label: "Content", href: "/content", icon: FileText },
       { label: "Config", href: "/config", icon: Settings },
     ],
@@ -39,13 +42,13 @@ const navGroups = [
       { label: "Signals", href: "/signals", icon: Zap },
       { label: "Executions", href: "/executions", icon: Activity },
       { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
-      { label: "Subscriptions", href: "/subscriptions", icon: Crown },
       { label: "Ambassadors", href: "/ambassadors", icon: Star },
     ],
   },
   {
     label: "System",
     items: [
+      { label: "System Health", href: "/system", icon: Server },
       { label: "Audit Logs", href: "/audit-logs", icon: ScrollText },
     ],
   },

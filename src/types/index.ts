@@ -353,3 +353,99 @@ export interface ApiError {
   detail: string;
   request_id?: string;
 }
+
+// ── Dashboard Analytics ───────────────────────────────────
+export interface DashboardAnalytics {
+  total_users: number;
+  new_users_24h: number;
+  new_users_7d: number;
+  total_revenue_usd: number;
+  revenue_30d: number;
+  active_subscriptions: number;
+  total_executions: number;
+  executions_24h: number;
+  filled_executions: number;
+  failed_executions: number;
+  total_pnl: number;
+  pnl_today: number;
+  win_rate: number;
+  active_strategies: number;
+  active_signals: number;
+  open_tickets: number;
+}
+
+// ── Trading Analytics ─────────────────────────────────────
+export interface TradingAnalytics {
+  win_rate: number;
+  loss_rate: number;
+  total_trades: number;
+  avg_pnl: number;
+  best_trade: number;
+  worst_trade: number;
+  pnl_by_day: Array<{ date: string; pnl: number; trades_count: number }>;
+  executions_by_day: Array<{ date: string; filled: number; failed: number; total: number }>;
+  by_symbol: Array<{ symbol: string; trades: number; wins: number; losses: number; total_pnl: number; avg_pnl: number }>;
+  by_direction: {
+    buy: { trades: number; wins: number; pnl: number };
+    sell: { trades: number; wins: number; pnl: number };
+  };
+  by_strategy_type: Array<{ strategy_type: string; trades: number; wins: number; total_pnl: number }>;
+}
+
+// ── Signal Analytics ──────────────────────────────────────
+export interface SignalAnalytics {
+  total_signals: number;
+  by_status: { new: number; executing: number; filled: number; expired: number; cancelled: number };
+  accuracy_rate: number;
+  avg_confidence: number;
+  avg_rr_ratio: number;
+  by_symbol: Array<{ symbol: string; total: number; filled: number; expired: number; avg_confidence: number }>;
+  signals_by_day: Array<{ date: string; count: number; filled: number; expired: number }>;
+}
+
+// ── User Growth Chart ─────────────────────────────────────
+export interface UserGrowthPoint {
+  date: string;
+  new_users: number;
+  cumulative_total: number;
+}
+
+// ── Revenue Chart ─────────────────────────────────────────
+export interface RevenueChartPoint {
+  date: string;
+  revenue_usd: number;
+  payments_count: number;
+}
+
+// ── System Health ─────────────────────────────────────────
+export interface SystemHealth {
+  database: string;
+  timestamp: string;
+  version: string;
+  uptime_info: { server_started: string };
+}
+
+export interface PipelineStatus {
+  last_signal_at: string | null;
+  last_execution_at: string | null;
+  total_signals_today: number;
+  total_executions_today: number;
+  active_strategies: number;
+  pending_executions: number;
+}
+
+// ── Payments ──────────────────────────────────────────────
+export interface Payment {
+  id: string;
+  subscription_id: string;
+  user_id: string;
+  user_email: string | null;
+  plan_name: string | null;
+  amount_usd: number;
+  amount_crypto: number | null;
+  crypto_currency: string | null;
+  nowpayments_payment_id: string | null;
+  status: PaymentStatus;
+  paid_at: string | null;
+  created_at: string;
+}

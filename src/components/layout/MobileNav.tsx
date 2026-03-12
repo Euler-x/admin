@@ -3,21 +3,24 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShieldAlert, LayoutDashboard, Users, CreditCard, FileText, MessageSquare, Brain, Zap, Activity, ArrowLeftRight, Crown, Star, ScrollText, Settings } from "lucide-react";
+import { X, ShieldAlert, LayoutDashboard, BarChart3, Users, CreditCard, FileText, MessageSquare, Brain, Zap, Activity, ArrowLeftRight, Crown, Star, Wallet, ScrollText, Settings, Server } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Users", href: "/users", icon: Users },
   { label: "Plans", href: "/plans", icon: CreditCard },
+  { label: "Subscriptions", href: "/subscriptions", icon: Crown },
+  { label: "Payments", href: "/payments", icon: Wallet },
   { label: "Content", href: "/content", icon: FileText },
   { label: "Tickets", href: "/tickets", icon: MessageSquare },
   { label: "Strategies", href: "/strategies", icon: Brain },
   { label: "Signals", href: "/signals", icon: Zap },
   { label: "Executions", href: "/executions", icon: Activity },
   { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
-  { label: "Subscriptions", href: "/subscriptions", icon: Crown },
   { label: "Ambassadors", href: "/ambassadors", icon: Star },
+  { label: "System Health", href: "/system", icon: Server },
   { label: "Audit Logs", href: "/audit-logs", icon: ScrollText },
   { label: "Config", href: "/config", icon: Settings },
 ];
