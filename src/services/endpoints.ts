@@ -1,10 +1,9 @@
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
 export const ENDPOINTS = {
-  // Auth (same JWT system)
+  // Auth
   AUTH: {
-    SIGN_MESSAGE: `${API}/auth/sign-message`,
-    CONNECT: `${API}/auth/connect`,
+    LOGIN: `${API}/auth/login`,
     REFRESH: `${API}/auth/refresh`,
     ME: `${API}/auth/me`,
   },

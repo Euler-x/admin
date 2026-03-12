@@ -3,37 +3,22 @@ import api from "@/services/api";
 import { ENDPOINTS } from "@/services/endpoints";
 import { useAuthStore } from "@/stores/authStore";
 import toast from "react-hot-toast";
-import type { AuthResponse, SignMessageResponse, User } from "@/types";
+import type { AuthResponse, User } from "@/types";
 
 export default function useAuth() {
   const [loading, setLoading] = useState(false);
   const { setAuth, setUser, logout, user } = useAuthStore();
 
-  const getSignMessage = useCallback(async (walletAddress: string): Promise<string | null> => {
-    setLoading(true);
-    try {
-      const { data } = await api.get<SignMessageResponse>(ENDPOINTS.AUTH.SIGN_MESSAGE, {
-        params: { wallet_address: walletAddress },
-      });
-      return data.message;
-    } catch {
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const connectWallet = useCallback(
-    async (walletAddress: string, message: string, signature: string) => {
+  const login = useCallback(
+    async (email: string, password: string) => {
       setLoading(true);
       try {
-        const { data } = await api.post<AuthResponse>(ENDPOINTS.AUTH.CONNECT, {
-          wallet_address: walletAddress,
-          message,
-          signature,
+        const { data } = await api.post<AuthResponse>(ENDPOINTS.AUTH.LOGIN, {
+          email,
+          password,
         });
         if (!data.user.is_admin) {
-          toast.error("Access denied. This wallet is not an admin.");
+          toast.error("Access denied. This account is not an admin.");
           return null;
         }
         setAuth(data.user, data.access_token, data.refresh_token);
@@ -56,5 +41,5 @@ export default function useAuth() {
     }
   }, [setUser]);
 
-  return { loading, user, connectWallet, getSignMessage, fetchMe, logout };
+  return { loading, user, login, fetchMe, logout };
 }
