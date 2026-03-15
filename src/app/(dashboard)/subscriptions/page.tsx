@@ -13,6 +13,8 @@ import Select from "@/components/ui/Select";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { PageSpinner } from "@/components/ui/Spinner";
 import useAdminSubscriptions from "@/hooks/useAdminSubscriptions";
+import useAdminUsers from "@/hooks/useAdminUsers";
+import useAdminPlans from "@/hooks/useAdminPlans";
 import usePagination from "@/hooks/usePagination";
 import { formatDate, shortenAddress } from "@/lib/utils";
 import type { Subscription, SubscriptionStatus, SubscriptionGrant, SubscriptionOverride } from "@/types";
@@ -62,6 +64,8 @@ export default function SubscriptionsPage() {
     cancelSubscription,
   } = useAdminSubscriptions();
   const { page, pageSize, setPage, reset } = usePagination();
+  const { users: allUsers, fetchUsers: fetchAllUsers } = useAdminUsers();
+  const { plans: allPlans, fetchPlans: fetchAllPlans } = useAdminPlans();
   const [filterValues, setFilterValues] = useState<Record<string, string>>({
     search: "",
     status: "",
@@ -90,6 +94,24 @@ export default function SubscriptionsPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelTarget, setCancelTarget] = useState<Subscription | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
+
+  // Fetch users & plans when grant modal opens
+  useEffect(() => {
+    if (grantOpen) {
+      fetchAllUsers({ page: 1, page_size: 200 });
+      fetchAllPlans();
+    }
+  }, [grantOpen, fetchAllUsers, fetchAllPlans]);
+
+  const userOptions = allUsers.map((u) => ({
+    value: u.id,
+    label: u.email ? `${u.email} (${shortenAddress(u.id)})` : shortenAddress(u.id),
+  }));
+
+  const planOptions = allPlans.map((p) => ({
+    value: p.id,
+    label: `${p.name} — $${p.price_usd}/${p.billing_cycle}`,
+  }));
 
   const handleFilterChange = useCallback(
     (key: string, value: string) => {
@@ -246,15 +268,17 @@ export default function SubscriptionsPage() {
       {/* Grant Subscription Modal */}
       <Modal isOpen={grantOpen} onClose={() => setGrantOpen(false)} title="Grant Subscription" size="md">
         <div className="space-y-4">
-          <Input
-            label="User ID"
-            placeholder="Enter user ID"
+          <Select
+            label="User"
+            placeholder="Select a user..."
+            options={userOptions}
             value={grantForm.user_id}
             onChange={(e) => setGrantForm((f) => ({ ...f, user_id: e.target.value }))}
           />
-          <Input
-            label="Plan ID"
-            placeholder="Enter plan ID"
+          <Select
+            label="Plan"
+            placeholder="Select a plan..."
+            options={planOptions}
             value={grantForm.plan_id}
             onChange={(e) => setGrantForm((f) => ({ ...f, plan_id: e.target.value }))}
           />
