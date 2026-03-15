@@ -142,8 +142,8 @@ export default function UserDetailPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <h1 className="text-xl font-bold text-white font-mono">
-                  {shortenAddress(user.wallet_address_hash, 8)}
+                <h1 className="text-xl font-bold text-white">
+                  {user.email || shortenAddress(user.wallet_address_hash, 8)}
                 </h1>
                 <Badge variant={user.is_admin ? "neon" : "default"}>
                   {user.is_admin ? "Admin" : "User"}
@@ -151,10 +151,10 @@ export default function UserDetailPage() {
                 <StatusBadge status={user.is_active ? "active" : "inactive"} />
               </div>
               <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-400">
-                <span>
-                  <span className="text-gray-500">Email:</span>{" "}
-                  {user.email || "Not set"}
-                  {user.email && (
+                {user.email && (
+                  <span>
+                    <span className="text-gray-500">Email:</span>{" "}
+                    {user.email}
                     <span className="ml-1.5">
                       {user.email_verified ? (
                         <Badge variant="success">Verified</Badge>
@@ -162,8 +162,8 @@ export default function UserDetailPage() {
                         <Badge variant="warning">Unverified</Badge>
                       )}
                     </span>
-                  )}
-                </span>
+                  </span>
+                )}
                 <span>
                   <span className="text-gray-500">Wallet:</span>{" "}
                   {user.wallet_type}
@@ -249,8 +249,8 @@ export default function UserDetailPage() {
         title={user.is_admin ? "Revoke Admin Access" : "Grant Admin Access"}
         message={
           user.is_admin
-            ? `Are you sure you want to revoke admin privileges from ${shortenAddress(user.wallet_address_hash)}?`
-            : `Are you sure you want to grant admin privileges to ${shortenAddress(user.wallet_address_hash)}?`
+            ? `Are you sure you want to revoke admin privileges from ${user.email || shortenAddress(user.wallet_address_hash)}?`
+            : `Are you sure you want to grant admin privileges to ${user.email || shortenAddress(user.wallet_address_hash)}?`
         }
         confirmText={user.is_admin ? "Revoke" : "Grant"}
         confirmVariant={user.is_admin ? "danger" : "primary"}
@@ -265,8 +265,8 @@ export default function UserDetailPage() {
         title={user.is_active ? "Deactivate User" : "Activate User"}
         message={
           user.is_active
-            ? `Are you sure you want to deactivate ${shortenAddress(user.wallet_address_hash)}? They will lose access to the platform.`
-            : `Are you sure you want to activate ${shortenAddress(user.wallet_address_hash)}? They will regain access to the platform.`
+            ? `Are you sure you want to deactivate ${user.email || shortenAddress(user.wallet_address_hash)}? They will lose access to the platform.`
+            : `Are you sure you want to activate ${user.email || shortenAddress(user.wallet_address_hash)}? They will regain access to the platform.`
         }
         confirmText={user.is_active ? "Deactivate" : "Activate"}
         confirmVariant={user.is_active ? "danger" : "primary"}

@@ -77,21 +77,19 @@ export default function UsersPage() {
 
   const columns = [
     {
-      key: "wallet_address_hash",
-      header: "Wallet",
-      render: (user: User) => (
-        <span className="font-mono text-gray-200">
-          {shortenAddress(user.wallet_address_hash)}
-        </span>
-      ),
-    },
-    {
       key: "email",
-      header: "Email",
+      header: "User",
       render: (user: User) => (
-        <span className="text-gray-300">
-          {user.email || <span className="text-gray-600">--</span>}
-        </span>
+        <div>
+          <span className="text-gray-200">
+            {user.email || shortenAddress(user.wallet_address_hash)}
+          </span>
+          {user.email && (
+            <span className="block text-xs text-gray-500 font-mono mt-0.5">
+              {shortenAddress(user.wallet_address_hash)}
+            </span>
+          )}
+        </div>
       ),
     },
     {
