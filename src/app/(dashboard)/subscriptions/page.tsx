@@ -98,14 +98,14 @@ export default function SubscriptionsPage() {
   // Fetch users & plans when grant modal opens
   useEffect(() => {
     if (grantOpen) {
-      fetchAllUsers({ page: 1, page_size: 200 });
+      fetchAllUsers({ page: 1, page_size: 100 });
       fetchAllPlans();
     }
   }, [grantOpen, fetchAllUsers, fetchAllPlans]);
 
   const userOptions = allUsers.map((u) => ({
     value: u.id,
-    label: u.email ? `${u.email} (${shortenAddress(u.id)})` : shortenAddress(u.id),
+    label: u.email ? u.email : shortenAddress(u.id),
   }));
 
   const planOptions = allPlans.map((p) => ({
