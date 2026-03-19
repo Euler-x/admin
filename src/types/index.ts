@@ -150,6 +150,7 @@ export interface Subscription {
   grace_until: string | null;
   nowpayments_invoice_id: string | null;
   plan: Plan | null;
+  user_email: string | null;
   created_at: string;
 }
 

@@ -200,7 +200,7 @@ export default function SubscriptionsPage() {
       key: "user_id",
       header: "User",
       render: (s: Subscription) => (
-        <span className="font-mono text-xs text-neon">{shortenAddress(s.user_id)}</span>
+        <span className="text-xs text-neon">{s.user_email || shortenAddress(s.user_id)}</span>
       ),
     },
     {
@@ -337,7 +337,7 @@ export default function SubscriptionsPage() {
         onClose={() => setCancelOpen(false)}
         onConfirm={handleCancel}
         title="Cancel Subscription"
-        message={`Are you sure you want to cancel this subscription for user ${cancelTarget ? shortenAddress(cancelTarget.user_id) : ""}? This action cannot be undone.`}
+        message={`Are you sure you want to cancel this subscription for ${cancelTarget?.user_email || (cancelTarget ? shortenAddress(cancelTarget.user_id) : "")}? This action cannot be undone.`}
         confirmText="Cancel Subscription"
         confirmVariant="danger"
         loading={cancelLoading}
