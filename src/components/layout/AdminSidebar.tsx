@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, BarChart3, Users, CreditCard, FileText, MessageSquare,
   Brain, Zap, Activity, ArrowLeftRight, Crown, Star, Wallet,
-  ScrollText, Settings, Server, LogOut, ShieldAlert,
+  ScrollText, Settings, Server, LogOut, ShieldAlert, Terminal, ListChecks,
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -49,6 +49,8 @@ const navGroups = [
     label: "System",
     items: [
       { label: "System Health", href: "/system", icon: Server },
+      { label: "Logs", href: "/logs", icon: Terminal },
+      { label: "Tasks", href: "/tasks", icon: ListChecks },
       { label: "Audit Logs", href: "/audit-logs", icon: ScrollText },
     ],
   },

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShieldAlert, LayoutDashboard, BarChart3, Users, CreditCard, FileText, MessageSquare, Brain, Zap, Activity, ArrowLeftRight, Crown, Star, Wallet, ScrollText, Settings, Server } from "lucide-react";
+import { X, ShieldAlert, LayoutDashboard, BarChart3, Users, CreditCard, FileText, MessageSquare, Brain, Zap, Activity, ArrowLeftRight, Crown, Star, Wallet, ScrollText, Settings, Server, Terminal, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -21,6 +21,8 @@ const navItems = [
   { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
   { label: "Ambassadors", href: "/ambassadors", icon: Star },
   { label: "System Health", href: "/system", icon: Server },
+  { label: "Logs", href: "/logs", icon: Terminal },
+  { label: "Tasks", href: "/tasks", icon: ListChecks },
   { label: "Audit Logs", href: "/audit-logs", icon: ScrollText },
   { label: "Config", href: "/config", icon: Settings },
 ];

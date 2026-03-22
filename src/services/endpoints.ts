@@ -113,6 +113,10 @@ export const ENDPOINTS = {
   SYSTEM: {
     HEALTH: `${API}/admin/system/health`,
     PIPELINE: `${API}/admin/system/pipeline`,
+    LOGS: (service: string) => `${API}/admin/system/logs/${service}`,
+    TASKS: `${API}/admin/system/tasks`,
+    TOGGLE_TASK: (name: string) => `${API}/admin/system/tasks/${name}`,
+    SERVICES: `${API}/admin/system/services`,
   },
 
   // Admin Payments
