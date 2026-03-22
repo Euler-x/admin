@@ -67,8 +67,10 @@ export default function TradesPage() {
   // Stats from trading analytics
   const winRate = trading?.win_rate ?? 0;
   const totalTrades = trading?.total_trades ?? 0;
-  const totalWins = trading?.total_wins ?? 0;
-  const totalLosses = trading?.total_losses ?? 0;
+  const totalWins = trading?.by_direction
+    ? (trading.by_direction.buy?.wins ?? 0) + (trading.by_direction.sell?.wins ?? 0)
+    : 0;
+  const totalLosses = totalTrades - totalWins;
   const totalPnl = trading?.pnl_by_day?.reduce(
     (sum: number, d: { pnl: number }) => sum + d.pnl, 0
   ) ?? 0;
