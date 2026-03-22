@@ -40,7 +40,7 @@ const navGroups = [
     items: [
       { label: "Strategies", href: "/strategies", icon: Brain },
       { label: "Signals", href: "/signals", icon: Zap },
-      { label: "Executions", href: "/executions", icon: Activity },
+      { label: "Trades", href: "/executions", icon: Activity },
       { label: "Transactions", href: "/transactions", icon: ArrowLeftRight },
       { label: "Ambassadors", href: "/ambassadors", icon: Star },
     ],
