@@ -82,16 +82,13 @@ export default function TradesPage() {
     {
       key: "exchange",
       header: "Exchange",
-      render: (e: Execution) => {
-        const ex = (e as Record<string, unknown>).exchange as string || "hyperliquid";
-        return (
-          <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-            ex === "bybit" ? "bg-orange-500/10 text-orange-400" : "bg-emerald-500/10 text-emerald-400"
-          }`}>
-            {ex === "bybit" ? "Bybit" : "HL"}
-          </span>
-        );
-      },
+      render: (e: Execution) => (
+        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+          e.exchange === "bybit" ? "bg-orange-500/10 text-orange-400" : "bg-emerald-500/10 text-emerald-400"
+        }`}>
+          {e.exchange === "bybit" ? "Bybit" : "HL"}
+        </span>
+      ),
     },
     {
       key: "direction",
