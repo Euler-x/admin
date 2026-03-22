@@ -110,8 +110,8 @@ export default function TradesPage() {
       key: "user",
       header: "User",
       render: (e: Execution) => (
-        <span className="text-xs text-gray-400 font-mono">
-          {shortenAddress(e.user_id)}
+        <span className="text-xs text-gray-400">
+          {e.user_email || shortenAddress(e.user_id)}
         </span>
       ),
     },

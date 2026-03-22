@@ -110,6 +110,7 @@ export interface Execution {
   tx_hash: string | null;
   exchange_order_id: string | null;
   exchange: Exchange;
+  user_email: string | null;
   error_message: string | null;
   status: ExecutionStatus;
   executed_at: string | null;
