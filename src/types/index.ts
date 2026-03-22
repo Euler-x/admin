@@ -82,6 +82,7 @@ export interface Signal {
   risk_reward_ratio: number | null;
   indicators: Record<string, unknown> | null;
   status: SignalStatus;
+  exchange: string;
   expires_at: string | null;
   created_at: string;
 }

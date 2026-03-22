@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { XCircle } from "lucide-react";
 import PageTransition from "@/components/PageTransition";
 import FilterBar from "@/components/filters/FilterBar";
@@ -10,10 +10,18 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import Button from "@/components/ui/Button";
 import Pagination from "@/components/ui/Pagination";
 import ConfirmDialog from "@/components/ConfirmDialog";
-import useAdminSignals from "@/hooks/useAdminSignals";
+import { PageSpinner } from "@/components/ui/Spinner";
 import usePagination from "@/hooks/usePagination";
+import api from "@/services/api";
+import { ENDPOINTS } from "@/services/endpoints";
+import toast from "react-hot-toast";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import type { Signal, SignalDirection, SignalStatus } from "@/types";
+import type { Signal, SignalDirection, SignalStatus, PaginatedResponse } from "@/types";
+
+type ExchangeTab = "hyperliquid" | "bybit";
+
+const HL_LOGO = "https://res.cloudinary.com/dpwddkw5t/image/upload/v1774120519/hyprliquid_orr9vl.webp";
+const BYBIT_LOGO = "https://res.cloudinary.com/dpwddkw5t/image/upload/v1774120520/bybit_obnhd8.webp";
 
 const directionVariant: Record<SignalDirection, "success" | "danger" | "warning"> = {
   buy: "success",
@@ -37,9 +45,16 @@ const statusOptions = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
+function getEndpoints(exchange: ExchangeTab) {
+  return exchange === "bybit" ? ENDPOINTS.BYBIT_SIGNALS : ENDPOINTS.SIGNALS;
+}
+
 export default function SignalsPage() {
-  const { signals, totalPages, loading, fetchSignals, cancelSignal } = useAdminSignals();
   const { page, pageSize, setPage, reset } = usePagination();
+  const [exchange, setExchange] = useState<ExchangeTab>("hyperliquid");
+  const [signals, setSignals] = useState<Signal[]>([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<Record<string, string>>({
     search: "",
     direction: "",
@@ -48,20 +63,34 @@ export default function SignalsPage() {
   const [cancelTarget, setCancelTarget] = useState<Signal | null>(null);
   const [cancelling, setCancelling] = useState(false);
 
-  useEffect(() => {
-    const params: Record<string, unknown> = {
-      page,
-      page_size: pageSize,
-    };
-    if (filters.search) params.search = filters.search;
-    if (filters.direction) params.direction = filters.direction;
-    if (filters.status) params.status = filters.status;
+  const fetchSignals = useCallback(async () => {
+    setLoading(true);
+    try {
+      const ep = getEndpoints(exchange);
+      const params: Record<string, unknown> = { page, page_size: pageSize };
+      if (filters.search) params.symbol = filters.search;
+      if (filters.direction) params.direction = filters.direction;
+      if (filters.status) params.signal_status = filters.status;
 
-    fetchSignals(params);
-  }, [page, pageSize, filters, fetchSignals]);
+      const { data } = await api.get<PaginatedResponse<Signal>>(ep.LIST, { params });
+      setSignals(data.items.map((s) => ({ ...s, exchange: s.exchange || exchange })));
+      setTotalPages(data.total_pages);
+    } finally {
+      setLoading(false);
+    }
+  }, [exchange, page, pageSize, filters]);
+
+  useEffect(() => {
+    fetchSignals();
+  }, [fetchSignals]);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    reset();
+  };
+
+  const handleSwitchExchange = (ex: ExchangeTab) => {
+    setExchange(ex);
     reset();
   };
 
@@ -69,13 +98,11 @@ export default function SignalsPage() {
     if (!cancelTarget) return;
     setCancelling(true);
     try {
-      await cancelSignal(cancelTarget.id);
+      const ep = getEndpoints(exchange);
+      await api.put(ep.CANCEL(cancelTarget.id));
+      toast.success("Signal cancelled");
       setCancelTarget(null);
-      const params: Record<string, unknown> = { page, page_size: pageSize };
-      if (filters.search) params.search = filters.search;
-      if (filters.direction) params.direction = filters.direction;
-      if (filters.status) params.status = filters.status;
-      fetchSignals(params);
+      fetchSignals();
     } finally {
       setCancelling(false);
     }
@@ -83,101 +110,151 @@ export default function SignalsPage() {
 
   const columns = [
     {
+      key: "exchange",
+      header: "Exchange",
+      render: (s: Signal) => (
+        <div className="flex items-center gap-1.5">
+          <img
+            src={s.exchange === "bybit" ? BYBIT_LOGO : HL_LOGO}
+            alt=""
+            className="h-4 w-4 rounded-sm"
+          />
+          <span className={`text-[10px] font-medium ${
+            s.exchange === "bybit" ? "text-orange-400" : "text-emerald-400"
+          }`}>
+            {s.exchange === "bybit" ? "Bybit" : "HL"}
+          </span>
+        </div>
+      ),
+    },
+    {
       key: "symbol",
       header: "Symbol",
-      render: (signal: Signal) => (
-        <span className="text-white font-semibold">{signal.symbol}</span>
+      render: (s: Signal) => (
+        <span className="text-white font-semibold">{s.symbol}</span>
       ),
     },
     {
       key: "direction",
       header: "Direction",
-      render: (signal: Signal) => (
-        <Badge variant={directionVariant[signal.direction]}>
-          {signal.direction.charAt(0).toUpperCase() + signal.direction.slice(1)}
+      render: (s: Signal) => (
+        <Badge variant={directionVariant[s.direction]}>
+          {s.direction.toUpperCase()}
         </Badge>
       ),
     },
     {
       key: "confidence",
       header: "Confidence",
-      render: (signal: Signal) => (
+      render: (s: Signal) => (
         <span className="text-neon font-medium">
-          {(signal.confidence * 100).toFixed(0)}%
+          {(s.confidence * 100).toFixed(0)}%
         </span>
       ),
     },
     {
       key: "entry_price",
-      header: "Entry Price",
-      render: (signal: Signal) => (
-        <span className="text-gray-300">{formatCurrency(signal.entry_price)}</span>
+      header: "Entry",
+      render: (s: Signal) => (
+        <span className="text-gray-300">{formatCurrency(s.entry_price)}</span>
+      ),
+    },
+    {
+      key: "sl_tp",
+      header: "SL / TP",
+      render: (s: Signal) => (
+        <div className="text-xs">
+          <span className="text-red-400">{s.stop_loss ? formatCurrency(s.stop_loss) : "—"}</span>
+          <span className="text-gray-600 mx-1">/</span>
+          <span className="text-neon">{s.take_profit ? formatCurrency(s.take_profit) : "—"}</span>
+        </div>
+      ),
+    },
+    {
+      key: "rr",
+      header: "R:R",
+      render: (s: Signal) => (
+        <span className="text-gray-400 text-sm">
+          {s.risk_reward_ratio ? s.risk_reward_ratio.toFixed(1) : "—"}
+        </span>
       ),
     },
     {
       key: "status",
       header: "Status",
-      render: (signal: Signal) => <StatusBadge status={signal.status} />,
+      render: (s: Signal) => <StatusBadge status={s.status} />,
     },
     {
       key: "created_at",
       header: "Created",
-      render: (signal: Signal) => (
-        <span className="text-gray-400">{formatDate(signal.created_at)}</span>
+      render: (s: Signal) => (
+        <span className="text-gray-500 text-xs">{formatDate(s.created_at)}</span>
       ),
     },
     {
       key: "actions",
-      header: "Actions",
-      render: (signal: Signal) => {
-        const canCancel = signal.status === "new" || signal.status === "executing";
-        if (!canCancel) return <span className="text-gray-600">--</span>;
+      header: "",
+      render: (s: Signal) => {
+        const canCancel = s.status === "new" || s.status === "executing";
+        if (!canCancel) return null;
         return (
-          <Button
-            size="sm"
-            variant="danger"
-            onClick={() => setCancelTarget(signal)}
-          >
-            <XCircle className="h-3 w-3" />
-            Cancel
+          <Button size="sm" variant="danger" onClick={() => setCancelTarget(s)}>
+            <XCircle className="h-3 w-3" /> Cancel
           </Button>
         );
       },
     },
   ];
 
+  const exchangeLabel = exchange === "bybit" ? "Bybit" : "HyperLiquid";
+  const exchangeLogo = exchange === "bybit" ? BYBIT_LOGO : HL_LOGO;
+
+  if (loading && signals.length === 0) return <PageSpinner />;
+
   return (
     <PageTransition>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Signals</h1>
-          <p className="text-sm text-gray-400 mt-1">
-            Monitor and manage AI-generated trading signals
-          </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src={exchangeLogo} alt="" className="h-7 w-7 rounded" />
+            <div>
+              <h1 className="text-2xl font-bold text-white">{exchangeLabel} Signals</h1>
+              <p className="text-sm text-gray-400 mt-0.5">
+                AI-generated trading signals on {exchangeLabel}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Exchange Tabs */}
+        <div className="flex items-center gap-1 p-1 bg-dark-200/60 rounded-xl border border-white/5 w-fit">
+          {(["hyperliquid", "bybit"] as ExchangeTab[]).map((ex) => (
+            <button
+              key={ex}
+              onClick={() => handleSwitchExchange(ex)}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                exchange === ex
+                  ? "bg-neon/10 text-neon border border-neon/20"
+                  : "text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              <img
+                src={ex === "bybit" ? BYBIT_LOGO : HL_LOGO}
+                alt=""
+                className="h-4 w-4 rounded-sm"
+              />
+              {ex === "bybit" ? "Bybit" : "HyperLiquid"}
+            </button>
+          ))}
         </div>
 
         {/* Filters */}
         <FilterBar
           filters={[
-            {
-              key: "search",
-              label: "Search",
-              type: "search",
-              placeholder: "Search by symbol...",
-            },
-            {
-              key: "direction",
-              label: "Direction",
-              type: "select",
-              options: directionOptions,
-            },
-            {
-              key: "status",
-              label: "Status",
-              type: "select",
-              options: statusOptions,
-            },
+            { key: "search", label: "Search", type: "search", placeholder: "Search by symbol..." },
+            { key: "direction", label: "Direction", type: "select", options: directionOptions },
+            { key: "status", label: "Status", type: "select", options: statusOptions },
           ]}
           values={filters}
           onChange={handleFilterChange}
@@ -188,19 +265,18 @@ export default function SignalsPage() {
           columns={columns}
           data={signals}
           loading={loading}
-          emptyMessage="No signals found"
+          emptyMessage={`No ${exchangeLabel} signals found`}
         />
 
-        {/* Pagination */}
         <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
-        {/* Cancel Confirm Dialog */}
+        {/* Cancel Confirm */}
         <ConfirmDialog
           isOpen={!!cancelTarget}
           onClose={() => setCancelTarget(null)}
           onConfirm={handleCancel}
           title="Cancel Signal"
-          message={`Are you sure you want to cancel the ${cancelTarget?.direction?.toUpperCase()} signal for ${cancelTarget?.symbol ?? "this asset"}? This action cannot be undone.`}
+          message={`Cancel the ${cancelTarget?.direction?.toUpperCase()} signal for ${cancelTarget?.symbol ?? "this asset"} on ${exchangeLabel}?`}
           confirmText="Cancel Signal"
           confirmVariant="danger"
           loading={cancelling}
