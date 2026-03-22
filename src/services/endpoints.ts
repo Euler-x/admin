@@ -116,6 +116,11 @@ export const ENDPOINTS = {
   },
 
   // Admin System
+  SETTINGS: {
+    LIST: `${API}/admin/settings`,
+    SET: (key: string) => `${API}/admin/settings/${key}`,
+  },
+
   SYSTEM: {
     HEALTH: `${API}/admin/system/health`,
     PIPELINE: `${API}/admin/system/pipeline`,

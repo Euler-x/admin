@@ -48,6 +48,7 @@ const navGroups = [
   {
     label: "System",
     items: [
+      { label: "Settings", href: "/settings", icon: Settings },
       { label: "System Health", href: "/system", icon: Server },
       { label: "Logs", href: "/logs", icon: Terminal },
       { label: "Tasks", href: "/tasks", icon: ListChecks },
