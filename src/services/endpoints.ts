@@ -113,6 +113,7 @@ export const ENDPOINTS = {
     SIGNALS: `${API}/admin/analytics/signals`,
     USERS_CHART: `${API}/admin/analytics/users-chart`,
     REVENUE_CHART: `${API}/admin/analytics/revenue-chart`,
+    PERFORMANCE: `${API}/admin/analytics/performance`,
   },
 
   // Admin System

@@ -425,6 +425,66 @@ export interface RevenueChartPoint {
   payments_count: number;
 }
 
+// ── Performance Analytics (comprehensive) ─────────────────
+export interface ExchangeStats {
+  exchange: string;
+  trades: number;
+  wins: number;
+  losses: number;
+  total_pnl: number;
+  avg_pnl: number;
+  volume: number;
+}
+
+export interface SignalFunnel {
+  generated: number;
+  executed: number;
+  filled: number;
+  profitable: number;
+  conversion_rate: number;
+  profitability_rate: number;
+}
+
+export interface RecentTrade {
+  id: string;
+  symbol: string;
+  direction: string;
+  exchange: string;
+  pnl: number | null;
+  status: string;
+  entry_price: number;
+  exit_price: number | null;
+  leverage: number;
+  created_at: string;
+}
+
+export interface PerformanceAnalytics {
+  total_trades: number;
+  win_rate: number;
+  loss_rate: number;
+  total_pnl: number;
+  avg_pnl: number;
+  profit_factor: number;
+  sharpe_ratio: number;
+  max_drawdown: number;
+  best_trade: number;
+  worst_trade: number;
+  trade_volume: number;
+  active_users: number;
+  pnl_by_day: Array<{ date: string; pnl: number; trades_count: number }>;
+  cumulative_pnl_by_day: Array<{ date: string; cumulative_pnl: number }>;
+  executions_by_day: Array<{ date: string; filled: number; failed: number; total: number }>;
+  by_exchange: ExchangeStats[];
+  by_direction: {
+    buy: { trades: number; wins: number; pnl: number };
+    sell: { trades: number; wins: number; pnl: number };
+  };
+  by_symbol: Array<{ symbol: string; trades: number; wins: number; losses: number; total_pnl: number; avg_pnl: number }>;
+  by_strategy_type: Array<{ strategy_type: string; trades: number; wins: number; total_pnl: number }>;
+  signal_funnel: SignalFunnel;
+  recent_trades: RecentTrade[];
+}
+
 // ── System Health ─────────────────────────────────────────
 export interface SystemHealth {
   database: string;

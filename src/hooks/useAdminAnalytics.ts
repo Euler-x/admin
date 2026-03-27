@@ -4,7 +4,7 @@ import { ENDPOINTS } from "@/services/endpoints";
 import type {
   RevenueAnalytics, UserAnalytics, ExecutionAnalytics,
   DashboardAnalytics, TradingAnalytics, SignalAnalytics,
-  UserGrowthPoint, RevenueChartPoint,
+  UserGrowthPoint, RevenueChartPoint, PerformanceAnalytics,
 } from "@/types";
 
 export default function useAdminAnalytics() {
@@ -16,6 +16,7 @@ export default function useAdminAnalytics() {
   const [signalAnalytics, setSignalAnalytics] = useState<SignalAnalytics | null>(null);
   const [userGrowth, setUserGrowth] = useState<UserGrowthPoint[]>([]);
   const [revenueChart, setRevenueChart] = useState<RevenueChartPoint[]>([]);
+  const [performance, setPerformance] = useState<PerformanceAnalytics | null>(null);
   const [loading, setLoading] = useState(false);
 
   const fetchRevenue = useCallback(async (params?: Record<string, string>) => {
@@ -100,9 +101,25 @@ export default function useAdminAnalytics() {
     }
   }, []);
 
+  const fetchPerformance = useCallback(async (params: {
+    period: string;
+    start_date?: string;
+    end_date?: string;
+    exchange?: string;
+  }) => {
+    setLoading(true);
+    try {
+      const { data } = await api.get<PerformanceAnalytics>(ENDPOINTS.ANALYTICS.PERFORMANCE, { params });
+      setPerformance(data);
+      return data;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
-    revenue, userStats, executionStats, dashboard, trading, signalAnalytics, userGrowth, revenueChart,
+    revenue, userStats, executionStats, dashboard, trading, signalAnalytics, userGrowth, revenueChart, performance,
     loading,
-    fetchRevenue, fetchUserStats, fetchExecutionStats, fetchDashboard, fetchTrading, fetchSignalAnalytics, fetchUserGrowth, fetchRevenueChart,
+    fetchRevenue, fetchUserStats, fetchExecutionStats, fetchDashboard, fetchTrading, fetchSignalAnalytics, fetchUserGrowth, fetchRevenueChart, fetchPerformance,
   };
 }
