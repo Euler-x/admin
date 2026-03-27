@@ -379,19 +379,19 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2">
                     <div
                       className={`h-2.5 w-2.5 rounded-full ${
-                        health.database === "healthy"
+                        health.database === "ok"
                           ? "bg-neon shadow-[0_0_6px_rgba(57,255,20,0.5)]"
                           : "bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.5)]"
                       }`}
                     />
                     <span
                       className={`text-sm font-medium ${
-                        health.database === "healthy"
+                        health.database === "ok"
                           ? "text-neon"
                           : "text-red-400"
                       }`}
                     >
-                      {health.database === "healthy" ? "Healthy" : "Unhealthy"}
+                      {health.database === "ok" ? "Healthy" : "Unhealthy"}
                     </span>
                   </div>
                 </div>
