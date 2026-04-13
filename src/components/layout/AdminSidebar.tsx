@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, BarChart3, Users, CreditCard, FileText, MessageSquare,
   Brain, Zap, Activity, ArrowLeftRight, Crown, Star, Wallet,
-  ScrollText, Settings, Server, LogOut, ShieldAlert, Terminal, ListChecks,
+  ScrollText, Settings, Server, LogOut, Terminal, ListChecks,
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -65,8 +65,8 @@ export default function AdminSidebar() {
     <aside className="hidden lg:flex flex-col w-64 h-screen bg-dark-200/50 backdrop-blur-xl border-r border-white/5 fixed left-0 top-0 z-40">
       <div className="p-6 border-b border-white/5">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-neon/20 flex items-center justify-center">
-            <ShieldAlert className="h-5 w-5 text-neon" />
+          <div className="h-9 w-9 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center overflow-hidden">
+            <img src="/icon.svg" alt="EulerX" className="h-7 w-7" />
           </div>
           <div className="flex items-baseline gap-1.5">
             <span className="text-xl font-bold text-gradient">EulerX</span>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShieldAlert, LayoutDashboard, BarChart3, Users, CreditCard, FileText, MessageSquare, Brain, Zap, Activity, ArrowLeftRight, Crown, Star, Wallet, ScrollText, Settings, Server, Terminal, ListChecks } from "lucide-react";
+import { X, LayoutDashboard, BarChart3, Users, CreditCard, FileText, MessageSquare, Brain, Zap, Activity, ArrowLeftRight, Crown, Star, Wallet, ScrollText, Settings, Server, Terminal, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -55,8 +55,8 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
           >
             <div className="flex items-center justify-between p-6 border-b border-white/5">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-neon/20 flex items-center justify-center">
-                  <ShieldAlert className="h-5 w-5 text-neon" />
+                <div className="h-9 w-9 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center overflow-hidden">
+                  <img src="/icon.svg" alt="EulerX" className="h-7 w-7" />
                 </div>
                 <span className="text-xl font-bold text-gradient">EulerX</span>
               </div>

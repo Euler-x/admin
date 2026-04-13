@@ -39,8 +39,8 @@ export default function LoginPage() {
         className="relative z-10 w-full max-w-md"
       >
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-neon/10 border border-neon/20 mb-4">
-            <ShieldAlert className="h-8 w-8 text-neon" />
+          <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-white/[0.04] border border-white/[0.06] mb-4 overflow-hidden">
+            <img src="/icon.svg" alt="EulerX" className="h-12 w-12" />
           </div>
           <h1 className="text-2xl font-bold text-white">EulerX Admin</h1>
           <p className="text-sm text-gray-400 mt-2">Sign in with your admin credentials</p>
