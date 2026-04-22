@@ -390,6 +390,8 @@ export interface TradingAnalytics {
   avg_pnl: number;
   best_trade: number;
   worst_trade: number;
+  gross_profit: number;
+  gross_loss: number;
   pnl_by_day: Array<{ date: string; pnl: number; trades_count: number }>;
   executions_by_day: Array<{ date: string; filled: number; failed: number; total: number }>;
   by_symbol: Array<{ symbol: string; trades: number; wins: number; losses: number; total_pnl: number; avg_pnl: number }>;
