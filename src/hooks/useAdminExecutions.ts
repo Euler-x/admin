@@ -25,5 +25,12 @@ export default function useAdminExecutions() {
     return data;
   }, []);
 
-  return { executions, totalPages, loading, fetchExecutions, getExecution };
+  const closeExecution = useCallback(async (id: string) => {
+    const { data } = await api.post<{ execution: Execution; message: string }>(
+      ENDPOINTS.EXECUTIONS.CLOSE(id)
+    );
+    return data;
+  }, []);
+
+  return { executions, totalPages, loading, fetchExecutions, getExecution, closeExecution };
 }

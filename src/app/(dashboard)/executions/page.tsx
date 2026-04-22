@@ -15,7 +15,7 @@ import { formatCurrency, formatDate, formatPnl, shortenAddress } from "@/lib/uti
 import type { Execution, ExecutionStatus, SignalDirection } from "@/types";
 import {
   TrendingUp, TrendingDown, Activity, DollarSign,
-  RefreshCw, Target, XCircle, CheckCircle, Clock,
+  RefreshCw, Target, XCircle, CheckCircle, Clock, X,
 } from "lucide-react";
 
 type Tab = "open" | "closed" | "failed" | "all";
@@ -28,12 +28,14 @@ const TAB_CONFIG: { key: Tab; label: string; icon: typeof Activity; statuses: st
 ];
 
 export default function TradesPage() {
-  const { executions, totalPages, loading, fetchExecutions } = useAdminExecutions();
+  const { executions, totalPages, loading, fetchExecutions, closeExecution } = useAdminExecutions();
   const { trading, fetchTrading } = useAdminAnalytics();
   const { page, pageSize, setPage, reset } = usePagination();
   const [tab, setTab] = useState<Tab>("open");
   const [autoRefresh, setAutoRefresh] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [closingId, setClosingId] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   const loadData = useCallback(() => {
     const tabConfig = TAB_CONFIG.find((t) => t.key === tab);
@@ -165,7 +167,38 @@ export default function TradesPage() {
         <span className="text-gray-600 text-xs">{formatDate(e.created_at)}</span>
       ),
     },
+    {
+      key: "actions",
+      header: "",
+      render: (e: Execution) => {
+        if (e.status !== "filled") return null;
+        return (
+          <button
+            onClick={() => setConfirmId(e.id)}
+            disabled={closingId === e.id}
+            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition-colors disabled:opacity-50"
+          >
+            <X className="h-3 w-3" />
+            {closingId === e.id ? "Closing…" : "Close"}
+          </button>
+        );
+      },
+    },
   ];
+
+  const handleClose = async (id: string) => {
+    setConfirmId(null);
+    setClosingId(id);
+    try {
+      await closeExecution(id);
+      await loadData();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to close position";
+      alert(msg);
+    } finally {
+      setClosingId(null);
+    }
+  };
 
   if (loading && executions.length === 0) return <PageSpinner />;
 
@@ -266,6 +299,32 @@ export default function TradesPage() {
 
         <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
       </div>
+
+      {/* Close confirmation dialog */}
+      {confirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-dark-200 border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <h3 className="text-base font-semibold text-white mb-2">Close Position?</h3>
+            <p className="text-sm text-gray-400 mb-6">
+              This will place a market close order on the exchange and mark the execution as closed. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmId(null)}
+                className="flex-1 px-4 py-2 text-sm text-gray-400 border border-white/10 rounded-xl hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleClose(confirmId)}
+                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-500/20 border border-red-500/30 rounded-xl hover:bg-red-500/30 transition-colors"
+              >
+                Close Position
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </PageTransition>
   );
 }

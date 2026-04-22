@@ -58,6 +58,7 @@ export const ENDPOINTS = {
   EXECUTIONS: {
     LIST: `${API}/admin/executions`,
     GET: (id: string) => `${API}/admin/executions/${id}`,
+    CLOSE: (id: string) => `${API}/admin/executions/${id}/close`,
   },
 
   // Admin Transactions
