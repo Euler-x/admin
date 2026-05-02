@@ -12,7 +12,46 @@ export type SubscriptionStatus = "inactive" | "pending_payment" | "active" | "ex
 export type PaymentStatus = "waiting" | "confirming" | "confirmed" | "sending" | "partially_paid" | "finished" | "failed" | "refunded" | "expired";
 export type PlanStatus = "active" | "inactive" | "archived";
 export type BillingCycle = "monthly" | "quarterly" | "yearly";
-export type AmbassadorRank = "bronze" | "silver" | "gold" | "platinum" | "diamond";
+export type AmbassadorRank =
+  | "associate"
+  | "bronze_leader"
+  | "silver_leader"
+  | "gold_leader"
+  | "platinum_leader"
+  | "diamond_leader"
+  | "elite_diamond"
+  | "black_diamond"
+  | "crown_ambassador"
+  | "grand_crown";
+export type AmbassadorStatus = "active" | "suspended" | "under_review";
+export type ActivityEventType =
+  | "registered"
+  | "rank_changed"
+  | "commission_calculated"
+  | "commission_paid"
+  | "bonus_awarded"
+  | "bonus_paid"
+  | "payout_created"
+  | "payout_status_changed"
+  | "payout_cancelled"
+  | "referral_joined"
+  | "travel_awarded"
+  | "travel_status_changed"
+  | "training_completed"
+  | "training_removed"
+  | "status_changed"
+  | "admin_note_added"
+  | "pool_calculated";
+export type BonusType =
+  | "rank_advancement"
+  | "performance_milestone"
+  | "fast_start"
+  | "loyalty_retention"
+  | "leadership_pool"
+  | "generational_override";
+export type CommissionStatus = "pending" | "paid" | "cancelled";
+export type PayoutStatus = "pending" | "processing" | "paid" | "failed" | "cancelled";
+export type TravelStatus = "qualifying" | "qualified" | "awarded" | "expired";
 export type TicketStatus = "open" | "in_progress" | "resolved" | "closed";
 export type TicketPriority = "low" | "medium" | "high" | "urgent";
 export type ContentCategory = "crypto_basics" | "ai_trading" | "risk_management" | "automated_trading" | "platform_guide";
@@ -165,11 +204,167 @@ export interface Subscription {
 export interface Ambassador {
   id: string;
   user_id: string;
+  email: string | null;
+  masked_email: string | null;
   rank: AmbassadorRank;
+  status: AmbassadorStatus;
+  admin_notes: string | null;
   referral_code: string;
-  team_size: number;
+  par_count: number;
+  tav_count: number;
   total_referrals: number;
   rewards_earned: number;
+  payout_address: string | null;
+  rank_achieved_at: string | null;
+  fast_start_claimed: number;
+  created_at: string;
+}
+
+export interface ActivityLog {
+  id: string;
+  ambassador_id: string;
+  event_type: ActivityEventType;
+  description: string;
+  amount: number | null;
+  related_id: string | null;
+  actor: string;
+  created_at: string;
+}
+
+export interface DownlineNode {
+  ambassador_id: string;
+  user_id: string;
+  masked_email: string | null;
+  rank: AmbassadorRank;
+  par_count: number;
+  tav_count: number;
+  depth: number;
+  direct_referral_count: number;
+}
+
+export interface DownlineResponse {
+  ambassador_id: string;
+  total_nodes: number;
+  nodes_by_level: Record<number, DownlineNode[]>;
+}
+
+export interface RankDistributionItem {
+  rank: AmbassadorRank;
+  count: number;
+}
+
+export interface TopEarnerItem {
+  ambassador_id: string;
+  masked_email: string | null;
+  rank: AmbassadorRank;
+  commission_amount: number;
+}
+
+export interface AmbassadorAnalytics {
+  month: number;
+  year: number;
+  rank_distribution: RankDistributionItem[];
+  total_commissions_this_month: number;
+  total_bonuses_this_month: number;
+  new_ambassadors_this_month: number;
+  new_referrals_this_month: number;
+  pool_amount_this_month: number;
+  pending_payouts_count: number;
+  pending_payouts_amount: number;
+  top_earners: TopEarnerItem[];
+}
+
+export interface AdminCommission extends AmbassadorCommission {
+  ambassador_id: string;
+  masked_email: string | null;
+  rank: AmbassadorRank | null;
+}
+
+export interface AdminBonus extends AmbassadorBonus {
+  ambassador_id: string;
+  masked_email: string | null;
+  rank: AmbassadorRank | null;
+}
+
+export interface AdminTravel extends TravelIncentive {
+  ambassador_id: string;
+  masked_email: string | null;
+  rank: AmbassadorRank | null;
+}
+
+export interface AdminPayout extends AmbassadorPayout {
+  masked_email: string | null;
+  rank: AmbassadorRank | null;
+  commission_ids: string[] | null;
+  bonus_ids: string[] | null;
+}
+
+export interface TrainingCompletion {
+  id: string;
+  ambassador_id: string;
+  masked_email: string | null;
+  rank: AmbassadorRank | null;
+  module_name: string;
+  completed_at: string;
+  notes: string | null;
+}
+
+export interface AmbassadorCommission {
+  id: string;
+  month: number;
+  year: number;
+  active_referral_count: number;
+  tav_count: number;
+  commission_amount: number;
+  level_breakdown: Record<string, number> | null;
+  generational_override: number;
+  status: CommissionStatus;
+  paid_at: string | null;
+  created_at: string;
+}
+
+export interface AmbassadorBonus {
+  id: string;
+  bonus_type: BonusType;
+  amount: number;
+  period: string | null;
+  description: string | null;
+  status: CommissionStatus;
+  paid_at: string | null;
+  created_at: string;
+}
+
+export interface AmbassadorPayout {
+  id: string;
+  ambassador_id: string;
+  total_amount: number;
+  status: PayoutStatus;
+  payout_address: string | null;
+  admin_notes: string | null;
+  paid_at: string | null;
+  created_at: string;
+}
+
+export interface TravelIncentive {
+  id: string;
+  destination: string;
+  rank_required: AmbassadorRank;
+  qualification_start: string;
+  qualification_end: string | null;
+  status: TravelStatus;
+  awarded_at: string | null;
+  admin_notes: string | null;
+}
+
+export interface LeadershipPool {
+  id: string;
+  month: number;
+  year: number;
+  total_pool_amount: number;
+  eligible_ambassador_count: number;
+  per_ambassador_amount: number;
+  status: string;
+  paid_at: string | null;
   created_at: string;
 }
 
@@ -333,10 +528,22 @@ export interface SubscriptionOverride {
 }
 
 export interface AmbassadorUpdate {
-  rank?: AmbassadorRank;
-  rewards_earned?: number;
-  team_size?: number;
-  total_referrals?: number;
+  status?: AmbassadorStatus;
+  admin_notes?: string;
+  payout_address?: string;
+  rank_achieved_at?: string;
+}
+
+export interface UpdateCommissionRequest {
+  status?: CommissionStatus;
+  commission_amount?: number;
+  admin_notes?: string;
+}
+
+export interface UpdateBonusRequest {
+  status?: CommissionStatus;
+  amount?: number;
+  description?: string;
 }
 
 export interface ConfigUpdate {
