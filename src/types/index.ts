@@ -204,6 +204,7 @@ export interface Subscription {
 export interface Ambassador {
   id: string;
   user_id: string;
+  full_name: string | null;
   email: string | null;
   masked_email: string | null;
   rank: AmbassadorRank;

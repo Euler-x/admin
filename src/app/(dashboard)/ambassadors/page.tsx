@@ -82,7 +82,7 @@ const columns = [
     header: "User",
     render: (a: Ambassador) => (
       <div>
-        <p className="font-mono text-xs text-neon">{shortenAddress(a.user_id)}</p>
+        <p className="text-sm font-medium text-white">{a.full_name ?? (a.masked_email ?? a.email) ?? shortenAddress(a.user_id)}</p>
         {(a.masked_email ?? a.email) && <p className="text-xs text-gray-500 mt-0.5">{a.masked_email ?? a.email}</p>}
       </div>
     ),
