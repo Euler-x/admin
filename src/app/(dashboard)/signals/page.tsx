@@ -18,10 +18,23 @@ import toast from "react-hot-toast";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Signal, SignalDirection, SignalStatus, PaginatedResponse } from "@/types";
 
-type ExchangeTab = "hyperliquid" | "bybit";
+type ExchangeTab = "hyperliquid" | "bybit" | "binance";
 
 const HL_LOGO = "https://res.cloudinary.com/dpwddkw5t/image/upload/v1774120519/hyprliquid_orr9vl.webp";
 const BYBIT_LOGO = "https://res.cloudinary.com/dpwddkw5t/image/upload/v1774120520/bybit_obnhd8.webp";
+const BN_LOGO = "https://assets.coingecko.com/markets/images/52/large/binance.jpg";
+
+const EXCHANGE_LOGOS: Record<ExchangeTab, string> = {
+  hyperliquid: HL_LOGO,
+  bybit: BYBIT_LOGO,
+  binance: BN_LOGO,
+};
+
+const EXCHANGE_LABELS: Record<ExchangeTab, string> = {
+  hyperliquid: "HyperLiquid",
+  bybit: "Bybit",
+  binance: "Binance",
+};
 
 const directionVariant: Record<SignalDirection, "success" | "danger" | "warning"> = {
   buy: "success",
@@ -46,7 +59,9 @@ const statusOptions = [
 ];
 
 function getEndpoints(exchange: ExchangeTab) {
-  return exchange === "bybit" ? ENDPOINTS.BYBIT_SIGNALS : ENDPOINTS.SIGNALS;
+  if (exchange === "bybit") return ENDPOINTS.BYBIT_SIGNALS;
+  if (exchange === "binance") return ENDPOINTS.BINANCE_SIGNALS;
+  return ENDPOINTS.SIGNALS;
 }
 
 export default function SignalsPage() {
@@ -115,14 +130,14 @@ export default function SignalsPage() {
       render: (s: Signal) => (
         <div className="flex items-center gap-1.5">
           <img
-            src={s.exchange === "bybit" ? BYBIT_LOGO : HL_LOGO}
+            src={EXCHANGE_LOGOS[(s.exchange as ExchangeTab) || "hyperliquid"]}
             alt=""
             className="h-4 w-4 rounded-sm"
           />
           <span className={`text-[10px] font-medium ${
-            s.exchange === "bybit" ? "text-orange-400" : "text-emerald-400"
+            s.exchange === "bybit" ? "text-orange-400" : s.exchange === "binance" ? "text-yellow-400" : "text-emerald-400"
           }`}>
-            {s.exchange === "bybit" ? "Bybit" : "HL"}
+            {s.exchange === "bybit" ? "Bybit" : s.exchange === "binance" ? "Binance" : "HL"}
           </span>
         </div>
       ),
@@ -206,8 +221,8 @@ export default function SignalsPage() {
     },
   ];
 
-  const exchangeLabel = exchange === "bybit" ? "Bybit" : "HyperLiquid";
-  const exchangeLogo = exchange === "bybit" ? BYBIT_LOGO : HL_LOGO;
+  const exchangeLabel = EXCHANGE_LABELS[exchange];
+  const exchangeLogo = EXCHANGE_LOGOS[exchange];
 
   if (loading && signals.length === 0) return <PageSpinner />;
 
@@ -229,7 +244,7 @@ export default function SignalsPage() {
 
         {/* Exchange Tabs */}
         <div className="flex items-center gap-1 p-1 bg-dark-200/60 rounded-xl border border-white/5 w-fit">
-          {(["hyperliquid", "bybit"] as ExchangeTab[]).map((ex) => (
+          {(["hyperliquid", "bybit", "binance"] as ExchangeTab[]).map((ex) => (
             <button
               key={ex}
               onClick={() => handleSwitchExchange(ex)}
@@ -240,11 +255,11 @@ export default function SignalsPage() {
               }`}
             >
               <img
-                src={ex === "bybit" ? BYBIT_LOGO : HL_LOGO}
+                src={EXCHANGE_LOGOS[ex]}
                 alt=""
                 className="h-4 w-4 rounded-sm"
               />
-              {ex === "bybit" ? "Bybit" : "HyperLiquid"}
+              {EXCHANGE_LABELS[ex]}
             </button>
           ))}
         </div>

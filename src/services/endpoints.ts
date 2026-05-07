@@ -80,6 +80,12 @@ export const ENDPOINTS = {
     CANCEL: (id: string) => `${API}/admin/bybit-signals/${id}/cancel`,
   },
 
+  BINANCE_SIGNALS: {
+    LIST: `${API}/admin/binance-signals`,
+    GET: (id: string) => `${API}/admin/binance-signals/${id}`,
+    CANCEL: (id: string) => `${API}/admin/binance-signals/${id}/cancel`,
+  },
+
   // Admin Strategies
   STRATEGIES: {
     LIST: `${API}/admin/strategies`,

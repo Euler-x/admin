@@ -132,12 +132,13 @@ export interface SignalDetail extends Signal {
 }
 
 // ── Executions ─────────────────────────────────────────────
-export type Exchange = "hyperliquid" | "bybit";
+export type Exchange = "hyperliquid" | "bybit" | "binance";
 
 export interface Execution {
   id: string;
   signal_id: string | null;
   bybit_signal_id: string | null;
+  binance_signal_id: string | null;
   user_id: string;
   strategy_id: string;
   order_type: OrderType;

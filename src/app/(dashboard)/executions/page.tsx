@@ -84,9 +84,13 @@ export default function TradesPage() {
       header: "Exchange",
       render: (e: Execution) => (
         <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-          e.exchange === "bybit" ? "bg-orange-500/10 text-orange-400" : "bg-emerald-500/10 text-emerald-400"
+          e.exchange === "bybit"
+            ? "bg-orange-500/10 text-orange-400"
+            : e.exchange === "binance"
+              ? "bg-yellow-500/10 text-yellow-400"
+              : "bg-emerald-500/10 text-emerald-400"
         }`}>
-          {e.exchange === "bybit" ? "Bybit" : "HL"}
+          {e.exchange === "bybit" ? "Bybit" : e.exchange === "binance" ? "Binance" : "HL"}
         </span>
       ),
     },
