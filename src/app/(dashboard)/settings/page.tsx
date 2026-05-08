@@ -162,7 +162,7 @@ export default function SettingsPage() {
 
                   {/* Input + actions */}
                   <div className="flex items-center gap-2 sm:w-64 shrink-0">
-                    {meta.type === "str" && key === "openrouter_models" ? (
+                    {meta.type === "str" && (key === "openrouter_models" || key === "buy_symbol_blocklist") ? (
                       <textarea
                         value={editValues[key] || ""}
                         onChange={(e) =>
@@ -171,6 +171,17 @@ export default function SettingsPage() {
                         rows={2}
                         className="flex-1 bg-dark-50 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-neon/50 focus:ring-1 focus:ring-neon/20 font-mono text-xs"
                       />
+                    ) : key === "buy_signals_enabled" ? (
+                      <select
+                        value={editValues[key] || "0"}
+                        onChange={(e) =>
+                          setEditValues((prev) => ({ ...prev, [key]: e.target.value }))
+                        }
+                        className="flex-1 bg-dark-50 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-neon/50 focus:ring-1 focus:ring-neon/20"
+                      >
+                        <option value="0">Disabled (SELL only)</option>
+                        <option value="1">Enabled</option>
+                      </select>
                     ) : (
                       <input
                         type={meta.type === "int" || meta.type === "float" ? "number" : "text"}
