@@ -20,9 +20,10 @@ interface SettingMeta {
 
 type SettingsMap = Record<string, SettingMeta>;
 
-const CATEGORY_ORDER = ["Trading", "Pipeline", "AI", "Billing", "Email"];
+const CATEGORY_ORDER = ["Trading", "Trend Filter", "Pipeline", "AI", "Billing", "Email"];
 const CATEGORY_COLORS: Record<string, string> = {
   Trading: "border-neon/20 bg-neon/5",
+  "Trend Filter": "border-orange-500/20 bg-orange-500/5",
   Pipeline: "border-purple-500/20 bg-purple-500/5",
   AI: "border-cyan-500/20 bg-cyan-500/5",
   Billing: "border-amber-500/20 bg-amber-500/5",
@@ -30,6 +31,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 const CATEGORY_LABEL_COLORS: Record<string, string> = {
   Trading: "text-neon",
+  "Trend Filter": "text-orange-400",
   Pipeline: "text-purple-400",
   AI: "text-cyan-400",
   Billing: "text-amber-400",
@@ -171,7 +173,19 @@ export default function SettingsPage() {
                         rows={2}
                         className="flex-1 bg-dark-50 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-neon/50 focus:ring-1 focus:ring-neon/20 font-mono text-xs"
                       />
-                    ) : key === "buy_signals_enabled" ? (
+                    ) : key === "market_trend" ? (
+                      <select
+                        value={editValues[key] || "neutral"}
+                        onChange={(e) =>
+                          setEditValues((prev) => ({ ...prev, [key]: e.target.value }))
+                        }
+                        className="flex-1 bg-dark-50 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-neon/50 focus:ring-1 focus:ring-neon/20"
+                      >
+                        <option value="neutral">Neutral (no filter)</option>
+                        <option value="bullish">🐂 Bullish (BUY only)</option>
+                        <option value="bearish">🐻 Bearish (SELL only)</option>
+                      </select>
+                    ) : key === "buy_signals_enabled" || key === "trend_filter_enabled" || key === "trend_counter_allow_high_confidence" ? (
                       <select
                         value={editValues[key] || "0"}
                         onChange={(e) =>
@@ -179,7 +193,7 @@ export default function SettingsPage() {
                         }
                         className="flex-1 bg-dark-50 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-neon/50 focus:ring-1 focus:ring-neon/20"
                       >
-                        <option value="0">Disabled (SELL only)</option>
+                        <option value="0">Disabled</option>
                         <option value="1">Enabled</option>
                       </select>
                     ) : (
