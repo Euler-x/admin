@@ -46,6 +46,35 @@ export function shortenAddress(address: string, chars = 4): string {
   return `${address.slice(0, chars + 2)}...${address.slice(-chars)}`;
 }
 
+export function isUuid(value: string): boolean {
+  if (!value) return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value
+  );
+}
+
+function toSafeUserRef(value: string): string {
+  const compact = value.replace(/[^a-zA-Z0-9]/g, "");
+  return compact ? `user_${compact.slice(0, 8).toLowerCase()}` : "Unknown user";
+}
+
+export function getSafeUserLabel(input: {
+  email?: string | null;
+  walletAddressHash?: string | null;
+  userId?: string | null;
+}): string {
+  const email = input.email?.trim();
+  if (email) return email;
+
+  const wallet = input.walletAddressHash?.trim();
+  if (wallet && !isUuid(wallet)) return shortenAddress(wallet);
+
+  const userId = input.userId?.trim();
+  if (userId) return toSafeUserRef(userId);
+  if (wallet) return toSafeUserRef(wallet);
+  return "Unknown user";
+}
+
 export function formatPnl(pnl: number | null | undefined): {
   text: string;
   color: string;

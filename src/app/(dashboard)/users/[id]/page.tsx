@@ -11,7 +11,7 @@ import Button from "@/components/ui/Button";
 import StatusBadge from "@/components/ui/StatusBadge";
 import Spinner from "@/components/ui/Spinner";
 import useAdminUsers from "@/hooks/useAdminUsers";
-import { shortenAddress, formatDate } from "@/lib/utils";
+import { formatDate, getSafeUserLabel } from "@/lib/utils";
 import {
   ArrowLeft,
   Shield,
@@ -124,6 +124,11 @@ export default function UserDetailPage() {
       color: "text-yellow-400",
     },
   ];
+  const userLabel = getSafeUserLabel({
+    email: user.email,
+    walletAddressHash: user.wallet_address_hash,
+    userId: user.id,
+  });
 
   return (
     <PageTransition>
@@ -143,7 +148,7 @@ export default function UserDetailPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <h1 className="text-xl font-bold text-white">
-                  {user.email || shortenAddress(user.wallet_address_hash, 8)}
+                  {userLabel}
                 </h1>
                 <Badge variant={user.is_admin ? "neon" : "default"}>
                   {user.is_admin ? "Admin" : "User"}
@@ -249,8 +254,8 @@ export default function UserDetailPage() {
         title={user.is_admin ? "Revoke Admin Access" : "Grant Admin Access"}
         message={
           user.is_admin
-            ? `Are you sure you want to revoke admin privileges from ${user.email || shortenAddress(user.wallet_address_hash)}?`
-            : `Are you sure you want to grant admin privileges to ${user.email || shortenAddress(user.wallet_address_hash)}?`
+            ? `Are you sure you want to revoke admin privileges from ${userLabel}?`
+            : `Are you sure you want to grant admin privileges to ${userLabel}?`
         }
         confirmText={user.is_admin ? "Revoke" : "Grant"}
         confirmVariant={user.is_admin ? "danger" : "primary"}
@@ -265,8 +270,8 @@ export default function UserDetailPage() {
         title={user.is_active ? "Deactivate User" : "Activate User"}
         message={
           user.is_active
-            ? `Are you sure you want to deactivate ${user.email || shortenAddress(user.wallet_address_hash)}? They will lose access to the platform.`
-            : `Are you sure you want to activate ${user.email || shortenAddress(user.wallet_address_hash)}? They will regain access to the platform.`
+            ? `Are you sure you want to deactivate ${userLabel}? They will lose access to the platform.`
+            : `Are you sure you want to activate ${userLabel}? They will regain access to the platform.`
         }
         confirmText={user.is_active ? "Deactivate" : "Activate"}
         confirmVariant={user.is_active ? "danger" : "primary"}

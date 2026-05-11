@@ -16,7 +16,7 @@ import useAdminSubscriptions from "@/hooks/useAdminSubscriptions";
 import useAdminUsers from "@/hooks/useAdminUsers";
 import useAdminPlans from "@/hooks/useAdminPlans";
 import usePagination from "@/hooks/usePagination";
-import { formatDate, shortenAddress } from "@/lib/utils";
+import { formatDate, getSafeUserLabel } from "@/lib/utils";
 import type { Subscription, SubscriptionStatus, SubscriptionGrant, SubscriptionOverride } from "@/types";
 
 const statusOptions = [
@@ -105,7 +105,11 @@ export default function SubscriptionsPage() {
 
   const userOptions = allUsers.map((u) => ({
     value: u.id,
-    label: u.email ? u.email : shortenAddress(u.id),
+    label: getSafeUserLabel({
+      email: u.email,
+      walletAddressHash: u.wallet_address_hash,
+      userId: u.id,
+    }),
   }));
 
   const planOptions = allPlans.map((p) => ({
@@ -200,7 +204,9 @@ export default function SubscriptionsPage() {
       key: "user_id",
       header: "User",
       render: (s: Subscription) => (
-        <span className="text-xs text-neon">{s.user_email || shortenAddress(s.user_id)}</span>
+        <span className="text-xs text-neon">
+          {getSafeUserLabel({ email: s.user_email, userId: s.user_id })}
+        </span>
       ),
     },
     {
@@ -337,7 +343,14 @@ export default function SubscriptionsPage() {
         onClose={() => setCancelOpen(false)}
         onConfirm={handleCancel}
         title="Cancel Subscription"
-        message={`Are you sure you want to cancel this subscription for ${cancelTarget?.user_email || (cancelTarget ? shortenAddress(cancelTarget.user_id) : "")}? This action cannot be undone.`}
+        message={`Are you sure you want to cancel this subscription for ${
+          cancelTarget
+            ? getSafeUserLabel({
+                email: cancelTarget.user_email,
+                userId: cancelTarget.user_id,
+              })
+            : ""
+        }? This action cannot be undone.`}
         confirmText="Cancel Subscription"
         confirmVariant="danger"
         loading={cancelLoading}

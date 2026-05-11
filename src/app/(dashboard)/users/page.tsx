@@ -9,7 +9,7 @@ import Pagination from "@/components/ui/Pagination";
 import Badge from "@/components/ui/Badge";
 import StatusBadge from "@/components/ui/StatusBadge";
 import useAdminUsers from "@/hooks/useAdminUsers";
-import { shortenAddress, formatDate } from "@/lib/utils";
+import { formatDate, getSafeUserLabel } from "@/lib/utils";
 import { Eye, Users as UsersIcon } from "lucide-react";
 import type { User } from "@/types";
 
@@ -82,11 +82,18 @@ export default function UsersPage() {
       render: (user: User) => (
         <div>
           <span className="text-gray-200">
-            {user.email || shortenAddress(user.wallet_address_hash)}
+            {getSafeUserLabel({
+              email: user.email,
+              walletAddressHash: user.wallet_address_hash,
+              userId: user.id,
+            })}
           </span>
           {user.email && (
             <span className="block text-xs text-gray-500 font-mono mt-0.5">
-              {shortenAddress(user.wallet_address_hash)}
+              {getSafeUserLabel({
+                walletAddressHash: user.wallet_address_hash,
+                userId: user.id,
+              })}
             </span>
           )}
         </div>

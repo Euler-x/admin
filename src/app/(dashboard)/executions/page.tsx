@@ -11,7 +11,7 @@ import { PageSpinner } from "@/components/ui/Spinner";
 import useAdminExecutions from "@/hooks/useAdminExecutions";
 import useAdminAnalytics from "@/hooks/useAdminAnalytics";
 import usePagination from "@/hooks/usePagination";
-import { formatCurrency, formatDate, formatPnl, shortenAddress } from "@/lib/utils";
+import { formatCurrency, formatDate, formatPnl, getSafeUserLabel } from "@/lib/utils";
 import type { Execution, ExecutionStatus, SignalDirection } from "@/types";
 import {
   TrendingUp, TrendingDown, Activity, DollarSign,
@@ -115,7 +115,7 @@ export default function TradesPage() {
       header: "User",
       render: (e: Execution) => (
         <span className="text-xs text-gray-400">
-          {e.user_email || shortenAddress(e.user_id)}
+          {getSafeUserLabel({ email: e.user_email, userId: e.user_id })}
         </span>
       ),
     },
