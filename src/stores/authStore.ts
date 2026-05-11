@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { User } from "@/types";
@@ -23,7 +24,7 @@ export const useAuthStore = create<AuthState>()(
       setAuth: (user, accessToken, refreshToken) =>
         set({ user, accessToken, refreshToken, isAuthenticated: true }),
       setTokens: (accessToken, refreshToken) =>
-        set({ accessToken, refreshToken }),
+        set({ accessToken, refreshToken, isAuthenticated: true }),
       setUser: (user) => set({ user }),
       logout: () =>
         set({
@@ -44,3 +45,22 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+export function useAuthHasHydrated(): boolean {
+  const [hasHydrated, setHasHydrated] = useState(() =>
+    typeof window !== "undefined" && useAuthStore.persist.hasHydrated()
+  );
+
+  useEffect(() => {
+    if (useAuthStore.persist.hasHydrated()) {
+      setHasHydrated(true);
+      return;
+    }
+    const unsub = useAuthStore.persist.onFinishHydration(() =>
+      setHasHydrated(true)
+    );
+    return unsub;
+  }, []);
+
+  return hasHydrated;
+}

@@ -5,17 +5,20 @@ import { useRouter } from "next/navigation";
 import AdminSidebar from "@/components/layout/AdminSidebar";
 import AdminTopbar from "@/components/layout/AdminTopbar";
 import MobileNav from "@/components/layout/MobileNav";
-import { useAuthStore } from "@/stores/authStore";
+import { PageSpinner } from "@/components/ui/Spinner";
+import { useAuthHasHydrated, useAuthStore } from "@/stores/authStore";
 import toast from "react-hot-toast";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const hasHydrated = useAuthHasHydrated();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const router = useRouter();
 
   useEffect(() => {
+    if (!hasHydrated) return;
     if (!isAuthenticated) {
       router.replace("/login");
       return;
@@ -25,8 +28,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       logout();
       router.replace("/login");
     }
-  }, [isAuthenticated, user, router, logout]);
+  }, [hasHydrated, isAuthenticated, user, router, logout]);
 
+  if (!hasHydrated) return <PageSpinner />;
   if (!isAuthenticated || !user?.is_admin) return null;
 
   return (

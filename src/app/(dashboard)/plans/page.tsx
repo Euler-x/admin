@@ -13,6 +13,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import useAdminPlans from "@/hooks/useAdminPlans";
 import { formatCurrency, capitalize } from "@/lib/utils";
 import { Plus, Pencil, Archive, CreditCard } from "lucide-react";
+import toast from "react-hot-toast";
 import type { Plan, PlanCreate, PlanUpdate, BillingCycle } from "@/types";
 
 interface PlanFormData {
@@ -51,6 +52,7 @@ export default function PlansPage() {
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
   const [formData, setFormData] = useState<PlanFormData>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [archiveTarget, setArchiveTarget] = useState<Plan | null>(null);
   const [archiving, setArchiving] = useState(false);
 
@@ -61,6 +63,7 @@ export default function PlansPage() {
   const openCreate = () => {
     setEditingPlan(null);
     setFormData(EMPTY_FORM);
+    setFormError(null);
     setModalOpen(true);
   };
 
@@ -76,6 +79,7 @@ export default function PlansPage() {
       ate_access: plan.ate_access,
       features: JSON.stringify(plan.features, null, 2),
     });
+    setFormError(null);
     setModalOpen(true);
   };
 
@@ -83,26 +87,50 @@ export default function PlansPage() {
     setModalOpen(false);
     setEditingPlan(null);
     setFormData(EMPTY_FORM);
+    setFormError(null);
+  };
+
+  const parseNumberField = (value: string, label: string) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      throw new Error(`${label} must be a valid number.`);
+    }
+    return parsed;
   };
 
   const handleSubmit = async () => {
+    setFormError(null);
     let parsedFeatures: Record<string, unknown>;
     try {
       parsedFeatures = JSON.parse(formData.features);
-    } catch {
+      if (!parsedFeatures || typeof parsedFeatures !== "object" || Array.isArray(parsedFeatures)) {
+        throw new Error("Features must be a valid JSON object.");
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Features must be a valid JSON object.";
+      setFormError(message);
+      toast.error(message);
       return;
     }
 
     setSaving(true);
     try {
+      const priceUsd = parseNumberField(formData.price_usd, "Price");
+      const maxStrategies = parseNumberField(formData.max_strategies, "Max strategies");
+      const maxAllocation = parseNumberField(formData.max_allocation, "Max allocation");
+      const trialDays = parseNumberField(formData.trial_days, "Trial days");
+
       if (editingPlan) {
         const payload: PlanUpdate = {
           name: formData.name,
-          price_usd: Number(formData.price_usd),
+          price_usd: priceUsd,
           billing_cycle: formData.billing_cycle,
-          max_strategies: Number(formData.max_strategies),
-          max_allocation: Number(formData.max_allocation),
-          trial_days: Number(formData.trial_days),
+          max_strategies: maxStrategies,
+          max_allocation: maxAllocation,
+          trial_days: trialDays,
           ate_access: formData.ate_access,
           features: parsedFeatures,
         };
@@ -110,11 +138,11 @@ export default function PlansPage() {
       } else {
         const payload: PlanCreate = {
           name: formData.name,
-          price_usd: Number(formData.price_usd),
+          price_usd: priceUsd,
           billing_cycle: formData.billing_cycle,
-          max_strategies: Number(formData.max_strategies),
-          max_allocation: Number(formData.max_allocation),
-          trial_days: Number(formData.trial_days),
+          max_strategies: maxStrategies,
+          max_allocation: maxAllocation,
+          trial_days: trialDays,
           ate_access: formData.ate_access,
           features: parsedFeatures,
         };
@@ -122,6 +150,13 @@ export default function PlansPage() {
       }
       closeModal();
       fetchPlans();
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Please fix the form values and try again.";
+      setFormError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -309,6 +344,7 @@ export default function PlansPage() {
             onChange={(e) => updateField("features", e.target.value)}
             rows={4}
           />
+          {formError && <p className="text-sm text-red-400">{formError}</p>}
 
           <div className="flex items-center justify-end gap-3 pt-2">
             <Button variant="ghost" onClick={closeModal}>
