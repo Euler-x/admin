@@ -47,9 +47,7 @@ export const useAuthStore = create<AuthState>()(
 );
 
 export function useAuthHasHydrated(): boolean {
-  const [hasHydrated, setHasHydrated] = useState(() =>
-    typeof window !== "undefined" && useAuthStore.persist.hasHydrated()
-  );
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
     if (useAuthStore.persist.hasHydrated()) {
