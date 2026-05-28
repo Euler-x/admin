@@ -43,6 +43,13 @@ function QueueBadge({ queue }: { queue: string }) {
   );
 }
 
+function exchangeLabel(task: CeleryTask): string {
+  if (task.name.includes("hyperliquid")) return "Hyperliquid";
+  if (task.name.includes("bybit")) return "Bybit";
+  if (task.name.includes("binance")) return "Binance";
+  return "System";
+}
+
 export default function TasksPage() {
   const [tasks, setTasks] = useState<CeleryTask[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,7 +102,7 @@ export default function TasksPage() {
           <div>
             <h1 className="text-2xl font-bold text-white">Scheduled Tasks</h1>
             <p className="text-sm text-gray-400 mt-1">
-              Manage Celery Beat periodic tasks
+              Manage Celery Beat tasks and exchange analysis pipelines
             </p>
           </div>
           <button
@@ -152,6 +159,9 @@ export default function TasksPage() {
                     Queue
                   </th>
                   <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Exchange
+                  </th>
+                  <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="text-left px-6 py-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -193,6 +203,13 @@ export default function TasksPage() {
                     {/* Queue */}
                     <td className="px-6 py-4">
                       <QueueBadge queue={task.queue} />
+                    </td>
+
+                    {/* Exchange */}
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-gray-300">
+                        {exchangeLabel(task)}
+                      </span>
                     </td>
 
                     {/* Status */}
