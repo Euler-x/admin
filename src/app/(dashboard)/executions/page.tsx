@@ -11,7 +11,7 @@ import { PageSpinner } from "@/components/ui/Spinner";
 import useAdminExecutions from "@/hooks/useAdminExecutions";
 import useAdminAnalytics from "@/hooks/useAdminAnalytics";
 import usePagination from "@/hooks/usePagination";
-import { formatCurrency, formatDate, formatPnl, getSafeUserLabel } from "@/lib/utils";
+import { formatDate, getSafeUserLabel } from "@/lib/utils";
 import type { Execution, ExecutionStatus, SignalDirection } from "@/types";
 import {
   TrendingUp, TrendingDown, Activity, DollarSign,
@@ -19,6 +19,52 @@ import {
 } from "lucide-react";
 
 type Tab = "open" | "closed" | "failed" | "all";
+
+function expandScientificNotation(value: string) {
+  if (!value.toLowerCase().includes("e")) return value;
+
+  const [mantissa, exponentText] = value.toLowerCase().split("e");
+  const exponent = Number(exponentText);
+  if (!Number.isFinite(exponent)) return value;
+
+  const sign = mantissa.startsWith("-") ? "-" : "";
+  const unsignedMantissa = sign ? mantissa.slice(1) : mantissa;
+  const [integerPart, fractionalPart = ""] = unsignedMantissa.split(".");
+  const digits = `${integerPart}${fractionalPart}`;
+  const decimalIndex = integerPart.length + exponent;
+
+  if (decimalIndex <= 0) {
+    return `${sign}0.${"0".repeat(Math.abs(decimalIndex))}${digits}`;
+  }
+
+  if (decimalIndex >= digits.length) {
+    return `${sign}${digits}${"0".repeat(decimalIndex - digits.length)}`;
+  }
+
+  return `${sign}${digits.slice(0, decimalIndex)}.${digits.slice(decimalIndex)}`;
+}
+
+function formatExactNumber(value: number | null | undefined) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return "-";
+  return expandScientificNotation(value.toString());
+}
+
+function formatExactUsd(value: number | null | undefined) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return "-";
+
+  const sign = value < 0 ? "-" : "";
+  return `${sign}$${formatExactNumber(Math.abs(value))}`;
+}
+
+function formatExactSignedUsd(value: number | null | undefined) {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return { text: "-", color: "text-gray-400" };
+  }
+
+  const sign = value > 0 ? "+" : "";
+  const color = value >= 0 ? "text-neon" : "text-red-400";
+  return { text: `${sign}${formatExactUsd(value)}`, color };
+}
 
 const TAB_CONFIG: { key: Tab; label: string; icon: typeof Activity; statuses: string[] }[] = [
   { key: "open", label: "Open Trades", icon: Activity, statuses: ["filled", "pending"] },
@@ -136,7 +182,7 @@ export default function TradesPage() {
         const entry = liveEntry ?? e.entry_price;
         return (
           <div className="flex flex-col">
-            <span className="text-white font-medium text-sm">{formatCurrency(entry)}</span>
+            <span className="text-white font-medium text-sm">{formatExactUsd(entry)}</span>
             {liveEntry && Math.abs(liveEntry - e.entry_price) > 0.00000001 && (
               <span className="text-[10px] text-emerald-400">live exchange</span>
             )}
@@ -149,7 +195,7 @@ export default function TradesPage() {
       header: "Mark",
       render: (e: Execution) => (
         <span className="text-gray-300 text-sm">
-          {e.mark_price ? formatCurrency(e.mark_price) : "—"}
+          {formatExactUsd(e.mark_price)}
         </span>
       ),
     },
@@ -158,7 +204,7 @@ export default function TradesPage() {
       header: "Exit",
       render: (e: Execution) => (
         <span className="text-gray-300 text-sm">
-          {e.exit_price ? formatCurrency(e.exit_price) : "—"}
+          {formatExactUsd(e.exit_price)}
         </span>
       ),
     },
@@ -166,7 +212,7 @@ export default function TradesPage() {
       key: "quantity",
       header: "Qty",
       render: (e: Execution) => (
-        <span className="text-gray-300 text-sm">{e.quantity.toFixed(4)}</span>
+        <span className="text-gray-300 text-sm">{formatExactNumber(e.quantity)}</span>
       ),
     },
     {
@@ -181,7 +227,7 @@ export default function TradesPage() {
       header: "PnL",
       render: (e: Execution) => {
         const isLive = e.status === "filled" && e.live_pnl !== null;
-        const { text, color } = formatPnl(isLive ? e.live_pnl : e.pnl);
+        const { text, color } = formatExactSignedUsd(isLive ? e.live_pnl : e.pnl);
         return (
           <div className="flex flex-col">
             <span className={`font-semibold text-sm ${color}`}>{text}</span>
@@ -285,7 +331,7 @@ export default function TradesPage() {
               {winRate.toFixed(1)}%
             </p>
             <p className="text-[10px] text-gray-600 mt-0.5">
-              +{formatCurrency(grossProfit)} / -{formatCurrency(grossLoss)}
+              {formatExactSignedUsd(grossProfit).text} / {formatExactSignedUsd(-grossLoss).text}
             </p>
           </div>
           <div className="bg-dark-200/60 border border-white/5 rounded-xl p-4">
@@ -294,7 +340,7 @@ export default function TradesPage() {
               <span className="text-xs text-gray-500">Total PnL (30d)</span>
             </div>
             <p className={`text-2xl font-bold ${totalPnl >= 0 ? "text-neon" : "text-red-400"}`}>
-              {totalPnl >= 0 ? "+" : ""}{formatCurrency(totalPnl)}
+              {formatExactSignedUsd(totalPnl).text}
             </p>
           </div>
           <div className="bg-dark-200/60 border border-white/5 rounded-xl p-4">
