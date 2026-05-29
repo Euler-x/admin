@@ -151,6 +151,10 @@ export interface Execution {
   tx_hash: string | null;
   exchange_order_id: string | null;
   exchange: Exchange;
+  symbol: string | null;
+  live_entry_price: number | null;
+  mark_price: number | null;
+  live_pnl: number | null;
   user_email: string | null;
   error_message: string | null;
   status: ExecutionStatus;

@@ -80,6 +80,15 @@ export default function TradesPage() {
 
   const columns = [
     {
+      key: "symbol",
+      header: "Symbol",
+      render: (e: Execution) => (
+        <span className="text-white font-semibold text-sm">
+          {e.symbol ?? "—"}
+        </span>
+      ),
+    },
+    {
       key: "exchange",
       header: "Exchange",
       render: (e: Execution) => (
@@ -122,8 +131,26 @@ export default function TradesPage() {
     {
       key: "entry_price",
       header: "Entry",
+      render: (e: Execution) => {
+        const liveEntry = e.status === "filled" ? e.live_entry_price : null;
+        const entry = liveEntry ?? e.entry_price;
+        return (
+          <div className="flex flex-col">
+            <span className="text-white font-medium text-sm">{formatCurrency(entry)}</span>
+            {liveEntry && Math.abs(liveEntry - e.entry_price) > 0.00000001 && (
+              <span className="text-[10px] text-emerald-400">live exchange</span>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      key: "mark_price",
+      header: "Mark",
       render: (e: Execution) => (
-        <span className="text-white font-medium text-sm">{formatCurrency(e.entry_price)}</span>
+        <span className="text-gray-300 text-sm">
+          {e.mark_price ? formatCurrency(e.mark_price) : "—"}
+        </span>
       ),
     },
     {
@@ -153,8 +180,14 @@ export default function TradesPage() {
       key: "pnl",
       header: "PnL",
       render: (e: Execution) => {
-        const { text, color } = formatPnl(e.pnl);
-        return <span className={`font-semibold text-sm ${color}`}>{text}</span>;
+        const isLive = e.status === "filled" && e.live_pnl !== null;
+        const { text, color } = formatPnl(isLive ? e.live_pnl : e.pnl);
+        return (
+          <div className="flex flex-col">
+            <span className={`font-semibold text-sm ${color}`}>{text}</span>
+            {isLive && <span className="text-[10px] text-emerald-400">live</span>}
+          </div>
+        );
       },
     },
     {
