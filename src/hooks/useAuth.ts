@@ -10,12 +10,13 @@ export default function useAuth() {
   const { setAuth, setUser, logout, user } = useAuthStore();
 
   const login = useCallback(
-    async (email: string, password: string) => {
+    async (email: string, password: string, cfTurnstileToken: string) => {
       setLoading(true);
       try {
         const { data } = await api.post<AuthResponse>(ENDPOINTS.AUTH.LOGIN, {
           email,
           password,
+          cf_turnstile_token: cfTurnstileToken,
         });
         if (!data.user.is_admin) {
           toast.error("Access denied. This account is not an admin.");

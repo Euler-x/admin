@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ShieldAlert, LogIn } from "lucide-react";
+import { LogIn } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import Turnstile, { type TurnstileInstance } from "@/components/ui/Turnstile";
 import useAuth from "@/hooks/useAuth";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -16,6 +17,9 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [cfToken, setCfToken] = useState("");
+
+  const turnstileRef = useRef<TurnstileInstance>(null);
 
   useEffect(() => {
     if (isAuthenticated && user?.is_admin) {
@@ -26,7 +30,13 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password) return;
-    await login(email.trim(), password);
+    try {
+      await login(email.trim(), password, cfToken);
+    } catch {
+      // Reset widget so the user gets a fresh token on retry
+      turnstileRef.current?.reset();
+      setCfToken("");
+    }
   };
 
   return (
@@ -64,6 +74,13 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
             />
+            <Turnstile
+              ref={turnstileRef}
+              onSuccess={setCfToken}
+              onExpire={() => setCfToken("")}
+              onError={() => setCfToken("")}
+            />
+
             <Button type="submit" size="lg" className="w-full group" loading={loading}>
               <LogIn className="h-4 w-4" />
               Sign In
